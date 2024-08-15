@@ -1,11 +1,11 @@
 import argparse
 import icalendar
-import urllib2
+from urllib.request import urlopen
 import re
 import codecs
 
 def fetch_ics(url):
-    ics = urllib2.urlopen(url)
+    ics = urlopen(url)
     return ics.read()
 
 def parse_ics(ics):
@@ -14,23 +14,25 @@ def parse_ics(ics):
     for comp in cal.walk():
         if comp.name == 'VEVENT':
             event = {}
-            print comp.get('summary')
-            event['title'] = u''.join(comp.get('summary')).encode('utf-8')
+            print(comp.get('summary'))
+            event['title'] = comp.get('summary') or ''
             event['date'] = str(comp.get('dtstart').dt)
-            event['text'] = u''.join(comp.get('description')).encode('utf-8')
+            event['text'] = comp.get('description') or ''
             items.append(event)
     return items
 
 def write_hugo(path,items):
     for item in items:
-        fname = item['title']
-        fname = fname.replace(' ','-')
-        fname = re.sub('[^0-9a-zA-Z-]*','',fname)
-        fpath = path+'/'+fname+'.md'
+        fname = item['title'] + '-' + item['date'][:10]
+        fname = fname.lower()
+        fname = re.sub(r'[\s/]+', '-', fname)
+        fname = re.sub(r'[^0-9a-zA-Z-]*', '', fname)
+        fpath = f'{path}/{fname}.md'
+        print(fname)
         with open(fpath,'w') as mdfile:
             mdfile.write('+++\n')
-            mdfile.write('date = \"'+item['date']+'\"\n')
-            mdfile.write('title = \"'+item['title']+'\"\n')
+            mdfile.write(f'date = "{ item["date"] }"\n')
+            mdfile.write(f'title = "{ item["title"] }"\n')
             mdfile.write('+++\n\n')
             mdfile.write(item['text'])
 
