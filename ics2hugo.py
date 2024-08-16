@@ -76,6 +76,7 @@ def write_hugo(path,items):
             mdfile.write(f'modified="{ item["modified"] }"\n')
             mdfile.write(f'date="{ item["date"] }"\n')
             mdfile.write(f'title="{ item["title"] }"\n')
+            mdfile.write(f'location="{ item["location"] }"\n')
             mdfile.write('+++\n\n')
 
             mdfile.write('\n'.join(embeds))
