@@ -33,7 +33,7 @@ def parse_ics(ics):
 
 def write_hugo(path,items):
     for item in items:
-        fid = re.sub(r'@.*', '', item['uid'])
+        fid = item['uid'][:8]
 
         # fname = re.sub(r'[\s/]+', '-', item['title'])
         # fname = re.sub(r'[^0-9a-zA-Z-]*', '', fname)
@@ -66,10 +66,10 @@ def write_hugo(path,items):
             aid=re.search(r'id=(.*)', url).group(1)
             try:
                 gpath = gdown.download(id=aid)
-                ext = os.path.splitext(gpath)[1]
-                apath = f'{path}/{aid}{ext}'.lower()
-                os.rename(gpath, apath)
-                embeds.append(f'![{ aid }]({aid}{ext})')
+                aname, aext = os.path.splitext(gpath)
+                apath = f'{ aid[:8] }{ aext }'.lower()
+                os.rename(gpath, os.path.join(path, apath))
+                embeds.append(f'![{ aname }]({ apath })')
                 print('Uploaded:', apath)
             except gdown.exceptions.FileURLRetrievalError:
                 logging.exception(f'Failed to download. Check permissions: {url}')
