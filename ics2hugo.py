@@ -22,7 +22,11 @@ def parse_ics(ics):
             event['modified'] = comp.get('last-modified').dt
             event['date'] = comp.get('dtstart').dt
             event['text'] = str(comp.get('description', default=''))
+
             event['attach'] = comp.get('attach', default=list())
+            if not isinstance(event['attach'], list):
+                event['attach'] = [ event['attach'] ]
+
             event['location'] = str(comp.get('location', default='unknown'))
             items.append(event)
     return items
@@ -48,7 +52,7 @@ def write_hugo(path,items):
                         last_modified = match.group(1)
                         break
 
-        if last_modified == str(item["modified"]):
+        if last_modified == str(item['modified']):
             print('Skipping because up-to-date:', item['title'])
             continue
 
@@ -57,7 +61,8 @@ def write_hugo(path,items):
         # upload attachments
 
         embeds = list()
-        for (i, url) in enumerate(item['attach']):
+        for url in item['attach']:
+            print(url)
             aid=re.search(r'id=(.*)', url).group(1)
             try:
                 gpath = gdown.download(id=aid)
