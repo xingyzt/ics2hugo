@@ -69,7 +69,7 @@ def write_hugo(path,items):
                 ext = os.path.splitext(gpath)[1]
                 apath = f'{path}/{aid}{ext}'.lower()
                 os.rename(gpath, apath)
-                embeds.append(f'![{ aid }]({ apath })')
+                embeds.append(f'![{ aid }]({aid}{ext})')
                 print('Uploaded:', apath)
             except gdown.exceptions.FileURLRetrievalError:
                 logging.exception(f'Failed to download. Check permissions: {url}')
